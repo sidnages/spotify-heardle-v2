@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import { styled } from 'styled-components';
 import { FONT_FAMILY } from '../../constants/styleConstants'
 
 export type TextProps = {
@@ -16,6 +16,7 @@ export const TextDiv = styled.div<TextProps>`
     font-weight: 400;
     word-wrap: break-word;
     text-align: left;
+    vertical-align: top;
     position: relative;
     left: ${props => props.left}px;
     top: ${props => props.top}px;

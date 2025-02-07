@@ -1,0 +1,1 @@
+export const FETCH_URL_EVENT_NAME = 'fetchUrl';
