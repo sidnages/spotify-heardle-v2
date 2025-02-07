@@ -14,3 +14,10 @@ export const PLACEHOLDER_PLAYLIST = {
         }
     ]
 };
+export const PLACEHOLDER_TARGET_TRACK = {
+    id: '2ATDkfqprlNNe9mYWodgdc',
+    title: 'Dancing Queen',
+    artists: ['ABBA'],
+    audioUrl: 'https://p.scdn.co/mp3-preview/a5bd4e4700d7e192ba6c4196dfce355d566d40a2',
+    thumbnailUrl: 'https://image-cdn-ak.spotifycdn.com/image/ab67616d0000b273f7ecaf9daf2c1d5ca89f7312'
+};

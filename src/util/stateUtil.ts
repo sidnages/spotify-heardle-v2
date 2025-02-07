@@ -1,50 +1,98 @@
 import savedUserState from '../data/savedUserState.json';
-import { Track } from '../interface/trackInterface';
-import { GameStatus } from '../interface/gameInterface';
 import { State } from '../state/userState';
 import { isSameDay } from '../util/generalUtil';
-import { readPlaylist, selectTargetTrack } from './trackUtil';
-import { DEFAULT_PLAYLIST_ID, DEFAULT_SEED, PLACEHOLDER_PLAYLIST } from '../constants/defaultConstants';
+import { resetPlaylist, resetTargetTrack } from './trackUtil';
+import { useUserState } from '../state/userState';
+import { DEFAULT_PLAYLIST_ID, DEFAULT_SEED } from '../constants/defaultConstants';
+import { SAVE_TO_FILE_EVENT_NAME } from '../constants/ipcConstants';
 
-export function fetchUserState(): State {
-    var state = savedUserState as State;
-    if (state.playlist === undefined ||
-        state.seed === undefined ||
-        state.date === undefined ||
-        state.guesses === undefined ||
-        state.targetTrack === undefined ||
-        state.gameStatus === undefined
+const ipcRenderer = window.require('electron').ipcRenderer;
+
+export function fetchUserState(
+    date: Date,
+    updatePlaylist: (_: State['playlist']) => void,
+    updateSeed: (_: State['seed']) => void,
+    updateDate: (_: State['date']) => void,
+    updateGuesses: (_: State['guesses']) => void,
+    updateTargetTrack: (_: State['targetTrack']) => void,
+    updateGameStatus: (_: State['gameStatus']) => void,
+): void {
+    var savedState = savedUserState as State;
+    if (savedState.playlist === undefined ||
+        savedState.seed === undefined ||
+        savedState.date === undefined ||
+        savedState.guesses === undefined ||
+        savedState.targetTrack === undefined ||
+        savedState.gameStatus === undefined
     ) {
-        state = initializeUserState();
+        console.log('Could not read saved user state, initializing from defaults');
+        initializeUserState(
+            date,
+            updatePlaylist,
+            updateSeed,
+            updateGuesses,
+            updateTargetTrack,
+            updateGameStatus
+        );
+        return;
     }
-    const currentDate = new Date();
-    console.log(state.date);
-    console.log(currentDate);
-    if (!isSameDay(state.date, currentDate)) {
-        const newTargetTrack = selectTargetTrack(state.playlist, state.date, state.seed);
-        state.targetTrack = newTargetTrack;
-        state.date = currentDate;
-        state.guesses = [];
-        state.gameStatus = GameStatus.IN_PROGRESS;
+    if (!isSameDay(savedState.date, date)) {
+        resetTargetTrack(
+            savedState.playlist,
+            savedState.seed,
+            date,
+            updateGuesses,
+            updateTargetTrack,
+            updateGameStatus
+        );
+        updateDate(savedState.date);
+    } else {
+        updateTargetTrack(savedState.targetTrack);
+        updateGuesses(savedState.guesses);
+        updateGameStatus(savedState.gameStatus);
     }
-    return state;
+    updatePlaylist(savedState.playlist);
+    updateSeed(savedState.seed);
 }
 
 // To be called if there is no saved state
-function initializeUserState(): State {
-    readPlaylist(DEFAULT_PLAYLIST_ID);
-    const playlist = PLACEHOLDER_PLAYLIST;
-    const seed = DEFAULT_SEED;
-    const date = new Date();
-    const targetTrack = selectTargetTrack(playlist, date, seed);
-    const guesses: Track[] = [];
-    const gameStatus = GameStatus.IN_PROGRESS;
-    return {
+function initializeUserState(
+    date: Date,
+    updatePlaylist: (_: State['playlist']) => void,
+    updateSeed: (_: State['seed']) => void,
+    updateGuesses: (_: State['guesses']) => void,
+    updateTargetTrack: (_: State['targetTrack']) => void,
+    updateGameStatus: (_: State['gameStatus']) => void
+): void {
+    resetPlaylist(
+        DEFAULT_PLAYLIST_ID,
+        DEFAULT_SEED,
+        date,
+        updatePlaylist,
+        updateSeed,
+        updateGuesses,
+        updateTargetTrack,
+        updateGameStatus
+    );
+}
+
+export function saveUserState(): void {
+    const playlist = useUserState((state) => state.playlist);
+    const seed = useUserState((state) => state.seed);
+    const date = useUserState((state) => state.date);
+    const guesses = useUserState((state) => state.guesses);
+    const targetTrack = useUserState((state) => state.targetTrack);
+    const gameStatus = useUserState((state) => state.gameStatus);
+    const finalState = {
         playlist,
         seed,
         date,
-        targetTrack,
         guesses,
+        targetTrack,
         gameStatus
-    };
+    }
+    ipcRenderer.invoke(SAVE_TO_FILE_EVENT_NAME, {
+        filename: './src/data/savedUserState.json',
+        content: JSON.stringify(finalState)
+    });
 }
