@@ -31,14 +31,17 @@ ipcMain.handle(SAVE_TO_FILE_EVENT_NAME, async (event, ...args) => {
 
 // Create the window and invoke renderer
 const createWindow = (): void => {
+  const width = 850;
+  const height = 600;
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    height: 600,
-    width: 800,
-    minHeight: 600,
-    maxHeight: 600,
-    minWidth: 800,
-    maxWidth: 800,
+    height: height,
+    width: width,
+    minHeight: height,
+    maxHeight: height,
+    minWidth: width,
+    maxWidth: width,
     webPreferences: {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
       nodeIntegration: true,

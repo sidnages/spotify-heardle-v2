@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { FONT_FAMILY } from '../../constants/styleConstants'
 
-export type TextProps = {
+type TextProps = {
     left: number,
     top: number,
     color: string,
@@ -9,7 +9,7 @@ export type TextProps = {
     text: string
 }
 
-export const TextDiv = styled.div<TextProps>`
+const TextDiv = styled.div<TextProps>`
     color: ${props => props.color};   
     font-size: ${props => props.fontSize}px;
     font-family: ${FONT_FAMILY};

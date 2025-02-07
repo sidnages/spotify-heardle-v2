@@ -4,7 +4,10 @@ import { useUserState } from './state/userState';
 import { GlobalStyle } from './styles/GlobalStyle';
 import { Text } from './components/Text';
 import { GuessPanel } from './components/GuessPanel';
+import { SearchPanel } from './components/SearchPanel';
+import { GameStatus } from './interface/gameInterface';
 import { fetchUserState, saveUserState } from './util/stateUtil';
+import { constructSearchOptions } from './util/searchUtil';
 import { PRIMARY_FOREGROUND_COLOR } from './constants/styleConstants';
 import { APP_CLOSE_EVENT_NAME } from './constants/ipcConstants';
 
@@ -26,6 +29,7 @@ function App() {
     const updateGuesses = useUserState((state) => state.updateGuesses);
     const updateTargetTrack = useUserState((state) => state.updateTargetTrack);
     const updateGameStatus = useUserState((state) => state.updateGameStatus);
+    const gameInProgress = (gameStatus === GameStatus.IN_PROGRESS);
 
     // This effect will fetch the user state once on App mount, and save the user state once when app closes
     useEffect(() => {
@@ -51,6 +55,13 @@ function App() {
             <GlobalStyle />
             <Text left={44} top={37} color={PRIMARY_FOREGROUND_COLOR} fontSize={40} text={'Spotify Heardle'} />
             <GuessPanel left={67} top={63} playlistName={playlist.title} guesses={guesses} />
+            <SearchPanel 
+                left={44}
+                top={223}
+                searchBarWidth={540}
+                searchOptions={constructSearchOptions(playlist)}
+                isDisabled={!gameInProgress}
+            />
         </>
     );
 }

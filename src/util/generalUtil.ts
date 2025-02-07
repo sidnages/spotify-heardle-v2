@@ -11,3 +11,7 @@ export function generateHash(input: string): number {
     const hashHexString = hash.toString(CryptoES.enc.Hex);
     return parseInt(hashHexString, 16);
 }
+
+export function stripAll(input: string): string {
+    return input.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+}
