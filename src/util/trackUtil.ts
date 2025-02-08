@@ -77,7 +77,7 @@ export function resetTargetTrack(
     updateGameStatus: (_: State['gameStatus']) => void
 ) {
     const tracks = playlist.tracks;
-    const newTargetTrackIndex = generateTrackIndex(date, seed, tracks.length);
+    const newTargetTrackIndex = generateTrackIndex(date, seed, playlist.id, tracks.length);
     console.log(`Switching target track to track index ${newTargetTrackIndex}`);
     const newTargetTrack = tracks[newTargetTrackIndex];
     readTrackThumbnailUrl(newTargetTrack.id, (thumbnailUrl) => {
@@ -116,8 +116,8 @@ function extractTrackThumbnailUrlFromEmbedResponse(response: string): string {
     return thumbnailUrl;
 }
 
-function generateTrackIndex(date: Date, seed: string, playlistLength: number): number {
+function generateTrackIndex(date: Date, seed: string, playlistId: string, playlistLength: number): number {
     const dateString = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-    const saltedString = dateString + seed;
+    const saltedString = dateString + playlistId + seed;
     return generateHash(saltedString) % playlistLength;
 }
