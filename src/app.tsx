@@ -12,7 +12,12 @@ import { MusicPlayer } from './components/MusicPlayer';
 import { GameStatus } from './interface/gameInterface';
 import { resetPlaylist } from './util/trackUtil';
 import { makeGuessFunction } from './util/guessUtil';
-import { fetchUserState, saveUserState, copyStateToClipboard } from './util/stateUtil';
+import { 
+    readSavedUserState,
+    loadUserState, 
+    saveUserState,
+    copyStateToClipboard 
+} from './util/stateUtil';
 import { constructSearchOptions } from './util/guessUtil';
 import { getPlayDurationMs } from './util/audioUtil';
 import { 
@@ -45,15 +50,18 @@ function App() {
 
     // This effect will fetch the user state once on App mount, and save the user state once when app closes
     useEffect(() => {
-        fetchUserState(
-            date,
-            updatePlaylist,
-            updateSeed,
-            updateDate,
-            updateGuesses,
-            updateTargetTrack,
-            updateGameStatus
-        );
+        readSavedUserState().then((savedData) => {
+            loadUserState(
+                savedData,
+                date,
+                updatePlaylist,
+                updateSeed,
+                updateDate,
+                updateGuesses,
+                updateTargetTrack,
+                updateGameStatus
+            );
+        });
 
         ipcRenderer.on(APP_CLOSE_EVENT_NAME, saveCurrentState);
 

@@ -1,4 +1,3 @@
-import savedUserState from '../data/savedUserState.json';
 import { Playlist, Track } from '../interface/trackInterface';
 import { State } from '../state/userState';
 import { isSameDay } from '../util/generalUtil';
@@ -6,34 +5,34 @@ import { resetPlaylist, resetTargetTrack } from './trackUtil';
 import { getGuessStatus } from './guessUtil';
 import { GuessStatus, GameStatus } from '../interface/gameInterface';
 import { DEFAULT_PLAYLIST_ID, DEFAULT_SEED, DEFAULT_USER_STATE_FILENAME } from '../constants/defaultConstants';
-import { SAVE_TO_FILE_EVENT_NAME } from '../constants/ipcConstants';
+import { READ_FROM_FILE_EVENT_NAME, SAVE_TO_FILE_EVENT_NAME } from '../constants/ipcConstants';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
 
-function readSavedState(): State {
+function parseSavedState(savedData: any): State {
     let playlist = undefined;
     let seed = undefined;
     let date = undefined;
     let guesses = undefined;
     let targetTrack = undefined;
     let gameStatus = undefined;
-    if ("playlist" in savedUserState) {
-        playlist = savedUserState.playlist;
+    if ("playlist" in savedData) {
+        playlist = savedData.playlist;
     }
-    if ("seed" in savedUserState) {
-        seed = savedUserState.seed;
+    if ("seed" in savedData) {
+        seed = savedData.seed;
     }
-    if ("date" in savedUserState) {
-        date = new Date(savedUserState.date);
+    if ("date" in savedData) {
+        date = new Date(savedData.date);
     }
-    if ("guesses" in savedUserState) {
-        guesses = savedUserState.guesses;
+    if ("guesses" in savedData) {
+        guesses = savedData.guesses;
     }
-    if ("targetTrack" in savedUserState) {
-        targetTrack = savedUserState.targetTrack;
+    if ("targetTrack" in savedData) {
+        targetTrack = savedData.targetTrack;
     }
-    if ("gameStatus" in savedUserState) {
-        gameStatus = savedUserState.gameStatus;
+    if ("gameStatus" in savedData) {
+        gameStatus = savedData.gameStatus;
     }
     return {
         playlist,
@@ -45,7 +44,8 @@ function readSavedState(): State {
     };
 }
 
-export function fetchUserState(
+export function loadUserState(
+    savedData: any,
     date: Date,
     updatePlaylist: (_: State['playlist']) => void,
     updateSeed: (_: State['seed']) => void,
@@ -54,7 +54,7 @@ export function fetchUserState(
     updateTargetTrack: (_: State['targetTrack']) => void,
     updateGameStatus: (_: State['gameStatus']) => void,
 ): void {
-    const savedState = readSavedState();
+    const savedState = parseSavedState(savedData);
     if (savedState.playlist === undefined ||
         savedState.seed === undefined ||
         savedState.date === undefined ||
@@ -112,6 +112,12 @@ function initializeUserState(
         updateTargetTrack,
         updateGameStatus
     );
+}
+
+export function readSavedUserState(): Promise<any> {
+    return ipcRenderer.invoke(READ_FROM_FILE_EVENT_NAME, {
+        filename: DEFAULT_USER_STATE_FILENAME
+    });
 }
 
 export function saveUserState(state: State): void {
