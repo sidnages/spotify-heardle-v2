@@ -7,6 +7,8 @@ import {
     YELLOW_ACCENT_COLOR
 } from '../../constants/styleConstants';
 import { Text } from '../Text';
+import { getGuessStatus } from '../../util/guessUtil';
+import { GuessStatus } from '../../interface/gameInterface';
 import { SKIPPED_TRACK_ID } from '../../constants/defaultConstants';
 
 type SongGuessProps = {
@@ -20,21 +22,27 @@ type SongGuessProps = {
 export function SongGuess(props: SongGuessProps) {
     let backgroundColor: string;
     let textColor: string;
-    if (!props.guess) {
-        backgroundColor = SECONDARY_BACKGROUND_COLOR;
-        textColor = SECONDARY_BACKGROUND_COLOR;
-    } else if (props.guess.id === SKIPPED_TRACK_ID) {
-        backgroundColor = SECONDARY_FOREGROUND_COLOR;
-        textColor = PRIMARY_BACKGROUND_COLOR;
-    } else if (props.guess.id === props.target.id) {
-        backgroundColor = GREEN_ACCENT_COLOR;
-        textColor = PRIMARY_BACKGROUND_COLOR;
-    } else if (props.guess.artists.filter((artist) => props.target.artists.includes(artist)).length > 0) {
-        backgroundColor = YELLOW_ACCENT_COLOR;
-        textColor = PRIMARY_BACKGROUND_COLOR;
-    } else {
-        backgroundColor = SECONDARY_FOREGROUND_COLOR;
-        textColor = PRIMARY_BACKGROUND_COLOR;
+    switch (getGuessStatus(props.guess, props.target)) {
+        case GuessStatus.None:
+            backgroundColor = SECONDARY_BACKGROUND_COLOR;
+            textColor = SECONDARY_BACKGROUND_COLOR;
+            break;
+        case GuessStatus.Skip:
+            backgroundColor = SECONDARY_FOREGROUND_COLOR;
+            textColor = PRIMARY_BACKGROUND_COLOR;
+            break;
+        case GuessStatus.Incorrect:
+            backgroundColor = SECONDARY_FOREGROUND_COLOR;
+            textColor = PRIMARY_BACKGROUND_COLOR;
+            break;
+        case GuessStatus.Partial:
+            backgroundColor = YELLOW_ACCENT_COLOR;
+            textColor = PRIMARY_BACKGROUND_COLOR;
+            break;
+        case GuessStatus.Correct:
+            backgroundColor = GREEN_ACCENT_COLOR;
+            textColor = PRIMARY_BACKGROUND_COLOR;
+            break;
     }
 
     const text = props.guess ? props.guess.title : ''

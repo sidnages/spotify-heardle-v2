@@ -1,10 +1,11 @@
 import savedUserState from '../data/savedUserState.json';
-import { GameStatus } from '../interface/gameInterface';
-import { Track } from '../interface/trackInterface';
+import { Playlist, Track } from '../interface/trackInterface';
 import { State } from '../state/userState';
 import { isSameDay } from '../util/generalUtil';
 import { resetPlaylist, resetTargetTrack } from './trackUtil';
+import { getGuessStatus } from './guessUtil';
 import { useUserState } from '../state/userState';
+import { GuessStatus, GameStatus } from '../interface/gameInterface';
 import { DEFAULT_PLAYLIST_ID, DEFAULT_SEED } from '../constants/defaultConstants';
 import { SAVE_TO_FILE_EVENT_NAME } from '../constants/ipcConstants';
 
@@ -99,23 +100,43 @@ export function saveUserState(): void {
     });
 }
 
-export function makeGuessFunction(
-    target: Track,
+export function copyStateToClipboard(
+    playlist: Playlist,
+    date: Date,
     guesses: Track[],
-    updateGuesses: (_: State['guesses']) => void,
-    updateGameStatus: (_: State['gameStatus']) => void
-): (_: Track) => void {
-    return (guess: Track) => {
-        if (guesses.length >= 6) {
-            console.error('Cant make guess - already at max guesses');
-            return;
+    targetTrack: Track,
+    gameStatus: GameStatus
+): void {
+    let output = ''
+    let result;
+    switch (gameStatus) {
+        case GameStatus.IN_PROGRESS:
+            result = '🚧';
+            break;
+        case GameStatus.CORRECT:
+            result = '✅';
+            break;
+        case GameStatus.OUT_OF_GUESSES:
+            result = '❌';
+            break;
+    }
+    output += `Spotify Heardle ${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()} ${result}\n`
+    output += `${playlist.title}\n`
+    for (let guess of guesses) {
+        switch (getGuessStatus(guess, targetTrack)) {
+            case GuessStatus.None:
+            case GuessStatus.Skip:
+            case GuessStatus.Incorrect:
+                output += '⚫';
+                break;
+            case GuessStatus.Partial:
+                output += '🟡';
+                break;
+            case GuessStatus.Correct:
+                output += '🟢'
+                break;
         }
-        const newGuesses = guesses.concat(guess);
-        updateGuesses(newGuesses);
-        if (guess.id === target.id) {
-            updateGameStatus(GameStatus.CORRECT);
-        } else if (newGuesses.length >= 6) {
-            updateGameStatus(GameStatus.OUT_OF_GUESSES);
-        }
-    };
+    }
+
+    navigator.clipboard.writeText(output);
 }

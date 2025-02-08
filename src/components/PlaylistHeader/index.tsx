@@ -71,8 +71,10 @@ export function PlaylistHeader(props: PlaylistHeaderProps) {
                 clickedIconColor={PRIMARY_FOREGROUND_COLOR}
                 clickedBackgroundColor={PRIMARY_BACKGROUND_COLOR}
                 onClickCallback = {() => {
+                    if (changingPlaylist) {
+                        props.updatePlaylistCallback(inputPlaylist);
+                    }
                     setChangingPlaylist(!changingPlaylist);
-                    props.updatePlaylistCallback(inputPlaylist);
                 }}
                 isDisabled={false}
             />

@@ -6,7 +6,7 @@ import { TextField } from '../TextField';
 import { TextButton } from '../TextButton'
 import { IconButton } from '../IconButton'
 import { Track } from '../../interface/trackInterface';
-import { getSuggestion } from '../../util/searchUtil';
+import { getSuggestion } from '../../util/guessUtil';
 import { 
     PRIMARY_BACKGROUND_COLOR, 
     PRIMARY_FOREGROUND_COLOR,
