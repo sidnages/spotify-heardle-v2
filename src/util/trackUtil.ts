@@ -23,7 +23,14 @@ export function resetPlaylist(
     })
 }
 
+function prevalidatePlaylistId(playlistId: string): boolean {
+    return playlistId.length === 22 && /^[a-zA-Z0-9]*$/.test(playlistId);
+}
+
 function readPlaylist(playlistId: string, callback: (_: Playlist) => void): void {
+    if (!prevalidatePlaylistId(playlistId)) {
+        return;
+    }
     const embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}`;
     console.log(`Fetching data from URL ${embedUrl}`);
     const embedResponse: Promise<string> = ipcRenderer.invoke(FETCH_URL_EVENT_NAME, {

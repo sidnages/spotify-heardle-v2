@@ -33,6 +33,7 @@ const TextInput = styled.input<TextFieldProps>`
     border-width: 0px;
     outline: none;
     width: ${props => props.width}px;
+    background: transparent;
 `
 
 export function TextField(props: TextFieldProps) {

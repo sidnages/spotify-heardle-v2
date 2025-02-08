@@ -3,10 +3,12 @@ import { createRoot } from 'react-dom/client';
 import { useUserState } from './state/userState';
 import { GlobalStyle } from './styles/GlobalStyle';
 import { Text } from './components/Text';
+import { PlaylistHeader } from './components/PlaylistHeader';
 import { GuessPanel } from './components/GuessPanel';
 import { SearchPanel } from './components/SearchPanel';
 import { MusicPlayer } from './components/MusicPlayer';
 import { GameStatus } from './interface/gameInterface';
+import { resetPlaylist } from './util/trackUtil';
 import { fetchUserState, saveUserState, makeGuessFunction } from './util/stateUtil';
 import { constructSearchOptions } from './util/searchUtil';
 import { getPlayDurationMs } from './util/audioUtil';
@@ -70,11 +72,28 @@ function App() {
             />
             <div style={{ display:'flex' }}>
                 <div style={{ width:550 }}>
-                    <GuessPanel 
+                    <PlaylistHeader 
                         left={67}
-                        top={48}
+                        top={45}
                         width={400}
                         playlistName={playlist.title}
+                        updatePlaylistCallback={(playlistId) =>
+                            resetPlaylist(
+                                playlistId,
+                                seed,
+                                date,  
+                                updatePlaylist,
+                                updateSeed,
+                                updateGuesses,
+                                updateTargetTrack,
+                                updateGameStatus
+                            )
+                        }
+                    />
+                    <GuessPanel 
+                        left={67}
+                        top={60}
+                        width={400}
                         targetTrack={targetTrack}
                         guesses={guesses}
                     />

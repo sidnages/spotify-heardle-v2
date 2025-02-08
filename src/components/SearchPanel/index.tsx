@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FaSearch } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import { TextField } from '../TextField';
