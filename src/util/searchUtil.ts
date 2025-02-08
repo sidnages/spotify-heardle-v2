@@ -7,7 +7,6 @@ export function constructSearchOptions(playlist: Playlist): Map<string, Track> {
 }
 
 export function getSuggestion(input: string, searchOptions: Map<string, Track>): string | undefined {
-    console.log("Getting suggestion");
     const strippedInput = stripAll(input);
     const searchOptionKeys = searchOptions.keys();
     let leftmostIndex = 999;
@@ -26,6 +25,5 @@ export function getSuggestion(input: string, searchOptions: Map<string, Track>):
             bestMatch = key;
         }
     }
-    console.log(`best match: ${bestMatch}`);
     return bestMatch;
 }

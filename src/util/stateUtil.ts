@@ -1,4 +1,6 @@
 import savedUserState from '../data/savedUserState.json';
+import { GameStatus } from '../interface/gameInterface';
+import { Track } from '../interface/trackInterface';
 import { State } from '../state/userState';
 import { isSameDay } from '../util/generalUtil';
 import { resetPlaylist, resetTargetTrack } from './trackUtil';
@@ -95,4 +97,25 @@ export function saveUserState(): void {
         filename: './src/data/savedUserState.json',
         content: JSON.stringify(finalState)
     });
+}
+
+export function makeGuessFunction(
+    target: Track,
+    guesses: Track[],
+    updateGuesses: (_: State['guesses']) => void,
+    updateGameStatus: (_: State['gameStatus']) => void
+): (_: Track) => void {
+    return (guess: Track) => {
+        if (guesses.length >= 6) {
+            console.error('Cant make guess - already at max guesses');
+            return;
+        }
+        const newGuesses = guesses.concat(guess);
+        updateGuesses(newGuesses);
+        if (guess.id === target.id) {
+            updateGameStatus(GameStatus.CORRECT);
+        } else if (newGuesses.length >= 6) {
+            updateGameStatus(GameStatus.OUT_OF_GUESSES);
+        }
+    };
 }

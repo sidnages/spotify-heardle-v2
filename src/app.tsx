@@ -5,9 +5,11 @@ import { GlobalStyle } from './styles/GlobalStyle';
 import { Text } from './components/Text';
 import { GuessPanel } from './components/GuessPanel';
 import { SearchPanel } from './components/SearchPanel';
+import { MusicPlayer } from './components/MusicPlayer';
 import { GameStatus } from './interface/gameInterface';
-import { fetchUserState, saveUserState } from './util/stateUtil';
+import { fetchUserState, saveUserState, makeGuessFunction } from './util/stateUtil';
 import { constructSearchOptions } from './util/searchUtil';
+import { getPlayDurationMs } from './util/audioUtil';
 import { PRIMARY_FOREGROUND_COLOR } from './constants/styleConstants';
 import { APP_CLOSE_EVENT_NAME } from './constants/ipcConstants';
 
@@ -53,13 +55,47 @@ function App() {
     return (
         <>
             <GlobalStyle />
-            <Text left={44} top={37} color={PRIMARY_FOREGROUND_COLOR} fontSize={40} text={'Spotify Heardle'} />
-            <GuessPanel left={67} top={63} playlistName={playlist.title} guesses={guesses} />
+            <Text 
+                left={44}
+                top={27}
+                width={400}
+                height={60}
+                borderRadius={0}
+                color={PRIMARY_FOREGROUND_COLOR}
+                fontSize={40}
+                text={'Spotify Heardle'}
+                textAlign='left'
+                verticalAlign='top'
+                paddingLeft={0}
+            />
+            <div style={{ display:'flex' }}>
+                <div style={{ width:550 }}>
+                    <GuessPanel 
+                        left={67}
+                        top={48}
+                        width={400}
+                        playlistName={playlist.title}
+                        targetTrack={targetTrack}
+                        guesses={guesses}
+                    />
+                </div>
+                <div style={{ width:200 }}>
+                    <MusicPlayer
+                        left={0}
+                        top={48}
+                        width={200}
+                        targetTrack={targetTrack}
+                        playDuration={getPlayDurationMs(guesses.length, gameStatus !== GameStatus.IN_PROGRESS)}
+                        gameStatus={gameStatus}
+                    />
+                </div>
+            </div>
             <SearchPanel 
                 left={44}
-                top={223}
+                top={55}
                 searchBarWidth={540}
                 searchOptions={constructSearchOptions(playlist)}
+                makeGuessCallback={makeGuessFunction(targetTrack, guesses, updateGuesses, updateGameStatus)}
                 isDisabled={!gameInProgress}
             />
         </>

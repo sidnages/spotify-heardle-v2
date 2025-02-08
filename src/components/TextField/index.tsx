@@ -48,14 +48,17 @@ export function TextField(props: TextFieldProps) {
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     if (!e.target.value) {
                         props.setInputValue(props.defaultText);
+                        props.onChangeCallback(e.target.value);
                     } else if (e.target.value === props.defaultText.slice(0, -1)) {
                         props.setInputValue('');
                         props.onChangeCallback('');
-                        return;
+                    } else if (e.target.value.slice(0, -1) === props.defaultText) {
+                        props.setInputValue(e.target.value[props.defaultText.length]);
+                        props.onChangeCallback(e.target.value[props.defaultText.length]);
                     } else {
                         props.setInputValue(e.target.value);
+                        props.onChangeCallback(e.target.value);
                     }
-                    props.onChangeCallback(e.target.value);
                 }}
                 onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                     if (props.inputValue === props.defaultText) {
