@@ -34,3 +34,5 @@ export const SKIPPED_TRACK = {
 export const MYSTERY_THUMBNAIL_URL = 'https://image-cdn-ak.spotifycdn.com/image/ab67616d0000b273806c160566580d6335d1f16c';
 export const MYSTERY_TRACK_TITLE = '[Unidentified Track]';
 export const MYSTERY_TRACK_ARTIST = '?????';
+
+export const DEFAULT_USER_STATE_FILENAME = './src/data/savedUserState.json';

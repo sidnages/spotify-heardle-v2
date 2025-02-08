@@ -40,6 +40,7 @@ function App() {
     const updateGuesses = useUserState((state) => state.updateGuesses);
     const updateTargetTrack = useUserState((state) => state.updateTargetTrack);
     const updateGameStatus = useUserState((state) => state.updateGameStatus);
+    const saveCurrentState = useUserState((state) => state.saveCurrentState);
     const gameInProgress = (gameStatus === GameStatus.IN_PROGRESS);
 
     // This effect will fetch the user state once on App mount, and save the user state once when app closes
@@ -54,10 +55,10 @@ function App() {
             updateGameStatus
         );
 
-        ipcRenderer.on(APP_CLOSE_EVENT_NAME, saveUserState);
+        ipcRenderer.on(APP_CLOSE_EVENT_NAME, saveCurrentState);
 
         return () => {
-            ipcRenderer.removeListener(APP_CLOSE_EVENT_NAME, saveUserState);
+            ipcRenderer.removeListener(APP_CLOSE_EVENT_NAME, saveCurrentState);
         }
     }, []);
     

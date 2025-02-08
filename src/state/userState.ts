@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { Playlist, Track } from '../interface/trackInterface';
 import { GameStatus } from '../interface/gameInterface';
+import { saveUserState } from '../util/stateUtil';
 import { DEFAULT_SEED, PLACEHOLDER_PLAYLIST, PLACEHOLDER_TARGET_TRACK } from '../constants/defaultConstants';
 
 export interface State {
@@ -19,9 +20,10 @@ interface Action {
     updateGuesses: (guesses: State['guesses']) => void;
     updateTargetTrack: (targetTrack: State['targetTrack']) => void;
     updateGameStatus: (gameStatus: State['gameStatus']) => void;
+    saveCurrentState: () => void;
 }
 
-export const useUserState = create<State & Action>((set) => ({
+export const useUserState = create<State & Action>((set, get) => ({
     // Set these to placeholder defaults, and then make an async call to initialize after
     playlist: PLACEHOLDER_PLAYLIST,
     seed: DEFAULT_SEED,
@@ -52,5 +54,18 @@ export const useUserState = create<State & Action>((set) => ({
     updateGameStatus: (gameStatus) => {
         console.log(`Updated game status in user state to ${gameStatus}`);
         set(() => ({ gameStatus: gameStatus }));
+    },
+    saveCurrentState: () => {
+        console.log('Saving user state to file');
+        const currentStateAndActions = get();
+        const currentState = {
+            playlist: currentStateAndActions.playlist,
+            seed: currentStateAndActions.seed,
+            date: currentStateAndActions.date,
+            guesses: currentStateAndActions.guesses,
+            targetTrack: currentStateAndActions.targetTrack,
+            gameStatus: currentStateAndActions.gameStatus
+        };
+        saveUserState(currentState);
     }
 }));
