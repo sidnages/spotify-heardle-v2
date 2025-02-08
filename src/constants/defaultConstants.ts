@@ -35,4 +35,4 @@ export const MYSTERY_THUMBNAIL_URL = 'https://image-cdn-ak.spotifycdn.com/image/
 export const MYSTERY_TRACK_TITLE = '[Unidentified Track]';
 export const MYSTERY_TRACK_ARTIST = '?????';
 
-export const DEFAULT_USER_STATE_FILENAME = './src/data/savedUserState.json';
+export const DEFAULT_USER_STATE_FILENAME = 'savedUserState.json';

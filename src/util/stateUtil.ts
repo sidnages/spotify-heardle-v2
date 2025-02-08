@@ -4,7 +4,12 @@ import { isSameDay } from '../util/generalUtil';
 import { resetPlaylist, resetTargetTrack } from './trackUtil';
 import { getGuessStatus } from './guessUtil';
 import { GuessStatus, GameStatus } from '../interface/gameInterface';
-import { DEFAULT_PLAYLIST_ID, DEFAULT_SEED, DEFAULT_USER_STATE_FILENAME } from '../constants/defaultConstants';
+import { 
+    PLACEHOLDER_PLAYLIST,
+    DEFAULT_PLAYLIST_ID,
+    DEFAULT_SEED,
+    DEFAULT_USER_STATE_FILENAME
+} from '../constants/defaultConstants';
 import { READ_FROM_FILE_EVENT_NAME, SAVE_TO_FILE_EVENT_NAME } from '../constants/ipcConstants';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
@@ -121,6 +126,9 @@ export function readSavedUserState(): Promise<any> {
 }
 
 export function saveUserState(state: State): void {
+    if (state.playlist.id === PLACEHOLDER_PLAYLIST.id) {
+        return;
+    }
     ipcRenderer.invoke(SAVE_TO_FILE_EVENT_NAME, {
         filename: DEFAULT_USER_STATE_FILENAME,
         content: JSON.stringify(state)

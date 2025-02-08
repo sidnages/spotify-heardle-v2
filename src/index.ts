@@ -1,3 +1,4 @@
+import path from 'path';
 import axios from 'axios';
 import * as fs from 'fs';
 import { app, BrowserWindow, ipcMain } from 'electron';
@@ -15,6 +16,12 @@ import {
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+// Check if in development mode
+const isDev = process.env.NODE_ENV === 'development'
+
+// Path to directory containing saved user date
+const dataDirectoryPath = isDev ? path.join(__dirname, '../../data') : path.join(process.resourcesPath, 'data');
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -30,14 +37,16 @@ ipcMain.handle(FETCH_URL_EVENT_NAME, async (event, ...args) => {
 
 ipcMain.handle(READ_FROM_FILE_EVENT_NAME, async (event, ...args) => {
   console.log(`Received read from file event with filename ${args[0].filename}`);
-  const data: any = JSON.parse(fs.readFileSync(args[0].filename, 'utf-8'));
+  const filePath = path.join(dataDirectoryPath, args[0].filename);
+  const data: any = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   console.log(`Successfully read from file ${args[0].filename}`);
   return data;
 })
 
 ipcMain.handle(SAVE_TO_FILE_EVENT_NAME, async (event, ...args) => {
   console.log(`Received save to file event with filename ${args[0].filename}`);
-  fs.writeFileSync(args[0].filename, args[0].content);
+  const filePath = path.join(dataDirectoryPath, args[0].filename)
+  fs.writeFileSync(filePath, args[0].content);
   console.log(`Successfully saved content to file ${args[0].filename}`);
 })
 
@@ -66,7 +75,14 @@ const createWindow = (): void => {
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (isDev) {
+    mainWindow.webContents.openDevTools();
+  }
+
+  // Remove the top menu.
+  if (!isDev) {
+    mainWindow.setMenuBarVisibility(false);
+  }
 
   // Register cleanup functions to window close.
   mainWindow.on('close', (event) => {
