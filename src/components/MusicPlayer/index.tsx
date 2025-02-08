@@ -1,5 +1,5 @@
 import { styled } from 'styled-components';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { GameStatus } from '../../interface/gameInterface';
 import { playAudio } from '../../util/audioUtil';
 import { Track } from '../../interface/trackInterface';
@@ -31,6 +31,7 @@ export function MusicPlayer(props: MusicPlayerProps) {
     const title = (props.gameStatus === GameStatus.IN_PROGRESS) ? MYSTERY_TRACK_TITLE : props.targetTrack.title;
     const artists = (props.gameStatus === GameStatus.IN_PROGRESS) ? MYSTERY_TRACK_ARTIST : props.targetTrack.artists.join(', ');
 
+    const [audio, setAudio] = useState(undefined);
     const [audioIsPlaying, setAudioIsPlaying] = useState(false);
     const icon = audioIsPlaying ? FaStop : FaPlay;
 
@@ -74,10 +75,20 @@ export function MusicPlayer(props: MusicPlayerProps) {
                 clickedIconColor={SECONDARY_BACKGROUND_COLOR}
                 clickedBackgroundColor={PRIMARY_FOREGROUND_COLOR}
                 onClickCallback = {() => {
-                    setAudioIsPlaying(true);
-                    playAudio(props.targetTrack.audioUrl, props.playDuration, () => {
-                        setAudioIsPlaying(false);
-                    });
+                    if (!audioIsPlaying) {
+                        const audio = new Audio(props.targetTrack.audioUrl);
+                        setAudioIsPlaying(true);
+                        setAudio(audio);
+                        playAudio(audio, props.playDuration, () => {
+                            setAudioIsPlaying(false);
+                        });
+                    } else {
+                        if (audio !== undefined) {
+                            audio.pause();
+                            setAudioIsPlaying(false);
+                            setAudio(undefined);
+                        }
+                    } 
                 }}
                 isDisabled={false}
             />

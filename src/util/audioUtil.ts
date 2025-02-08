@@ -1,9 +1,8 @@
 export async function playAudio(
-    audioUrl: string,
+    audio: HTMLAudioElement,
     durationMs: number,
     stopCallback: () => void
 ): Promise<void> {
-    const audio = new Audio(audioUrl);
     await audio.play();
     setTimeout(() => {
         stopAudio(audio, stopCallback);
