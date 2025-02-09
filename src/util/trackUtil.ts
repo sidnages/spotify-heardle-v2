@@ -51,9 +51,9 @@ function readPlaylist(playlistId: string, callback: (_: Playlist) => void): void
 function extractPlaylistFromEmbedResponse(playlistId: string, response: string): Playlist {
     const titleRegex = /"name":.*?,/;
     const title = response.match(titleRegex)[0].slice(8, -2);
-    const trackListRegex = /"trackList":\[.*?\]/;
-    const trackListString = response.match(trackListRegex)[0]
-    const rawTrackList = JSON.parse(trackListString.slice(12)) as PlaylistEmbedResponseTrack[];
+    const trackListRegex = /"trackList":\[.*?\],/;
+    const trackListString = response.match(trackListRegex)[0];
+    const rawTrackList = JSON.parse(trackListString.slice(12, -1)) as PlaylistEmbedResponseTrack[];
     const trackList: Track[] = rawTrackList.map((rawTrack) => {
         return {
             id: rawTrack.uri.split(':')[2],
