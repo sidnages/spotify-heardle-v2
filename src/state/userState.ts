@@ -38,23 +38,28 @@ export const useUserState = create<State & Action>((set, get) => ({
     },
     updateSeed: (seed) => {
         log.info(`Updated seed in user state to ${seed}`);
-        set(() => ({ seed: seed }))
+        set(() => ({ seed: seed }));
+        get().saveCurrentState();
     },
     updateDate: (date) => {
        log.info(`Updated date in user state to ${date.toISOString()}`);
         set(() => ({ date: date }));
+        get().saveCurrentState();
     },
     updateGuesses: (guesses) => {
         log.info(`Updated guesses in user state to ${JSON.stringify(guesses)}`);
         set(() => ({ guesses: guesses }));
+        get().saveCurrentState();
     },
     updateTargetTrack: (targetTrack) => {
         log.info(`Updated target track in user state to ${JSON.stringify(targetTrack)}`);
         set(() => ({ targetTrack: targetTrack }));
+        get().saveCurrentState();
     },
     updateGameStatus: (gameStatus) => {
         log.info(`Updated game status in user state to ${gameStatus}`);
         set(() => ({ gameStatus: gameStatus }));
+        get().saveCurrentState();
     },
     saveCurrentState: () => {
         log.info('Saving user state to file');

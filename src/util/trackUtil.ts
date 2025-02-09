@@ -42,8 +42,8 @@ function readPlaylist(playlistId: string, callback: (_: Playlist) => void): void
             callback(extractPlaylistFromEmbedResponse(playlistId, data));
         })
         .catch(function (error) {
-            console.warn('Could not retrieve playlist from embed link!')
-            console.error(error);
+            log.warn('Could not retrieve playlist from embed link!')
+            log.error(error);
         })
         .finally(function () {});
 }
@@ -105,8 +105,8 @@ function readTrackThumbnailUrl(trackId: string, callback: (_: string) => void): 
             callback(extractTrackThumbnailUrlFromEmbedResponse(data));
         })
         .catch(function (error) {
-            console.warn('Could not retrieve track from embed link!')
-            console.error(error);
+            log.warn('Could not retrieve track from embed link!')
+            log.error(error);
         })
         .finally(function () {});
 }
