@@ -3,6 +3,7 @@ import { State } from '../state/userState';
 import { isSameDay } from '../util/generalUtil';
 import { resetPlaylist, resetTargetTrack } from './trackUtil';
 import { getGuessStatus } from './guessUtil';
+import { log } from '../util/loggingUtil';
 import { GuessStatus, GameStatus } from '../interface/gameInterface';
 import { 
     PLACEHOLDER_PLAYLIST,
@@ -67,7 +68,7 @@ export function loadUserState(
         savedState.targetTrack === undefined ||
         savedState.gameStatus === undefined
     ) {
-        console.log('Could not read saved user state, initializing from defaults');
+        log.info('Could not read saved user state, initializing from defaults');
         initializeUserState(
             date,
             updatePlaylist,
@@ -79,7 +80,7 @@ export function loadUserState(
         return;
     }
     if (!isSameDay(savedState.date, date)) {
-        console.log('Date has changed - resetting track and guesses');
+        log.info('Date has changed - resetting track and guesses');
         resetTargetTrack(
             savedState.playlist,
             savedState.seed,

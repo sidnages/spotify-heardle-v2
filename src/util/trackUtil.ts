@@ -2,6 +2,7 @@ import { Playlist, Track, PlaylistEmbedResponseTrack } from '../interface/trackI
 import { GameStatus } from '../interface/gameInterface';
 import { State } from '../state/userState';
 import { generateHash } from './generalUtil';
+import { log } from '../util/loggingUtil';
 import { FETCH_URL_EVENT_NAME } from '../constants/ipcConstants';
 
 const ipcRenderer = window.require('electron').ipcRenderer;
@@ -32,7 +33,7 @@ function readPlaylist(playlistId: string, callback: (_: Playlist) => void): void
         return;
     }
     const embedUrl = `https://open.spotify.com/embed/playlist/${playlistId}`;
-    console.log(`Fetching data from URL ${embedUrl}`);
+    log.info(`Fetching data from URL ${embedUrl}`);
     const embedResponse: Promise<string> = ipcRenderer.invoke(FETCH_URL_EVENT_NAME, {
         url: embedUrl
     });
@@ -78,7 +79,7 @@ export function resetTargetTrack(
 ) {
     const tracks = playlist.tracks;
     const newTargetTrackIndex = generateTrackIndex(date, seed, playlist.id, tracks.length);
-    console.log(`Switching target track to track index ${newTargetTrackIndex}`);
+    log.info(`Switching target track to track index ${newTargetTrackIndex}`);
     const newTargetTrack = tracks[newTargetTrackIndex];
     readTrackThumbnailUrl(newTargetTrack.id, (thumbnailUrl) => {
         updateTargetTrack({
@@ -95,7 +96,7 @@ export function resetTargetTrack(
 
 function readTrackThumbnailUrl(trackId: string, callback: (_: string) => void): void {
     const embedUrl = `https://open.spotify.com/embed/track/${trackId}`;
-    console.log(`Fetching data from URL ${embedUrl}`);
+    log.info(`Fetching data from URL ${embedUrl}`);
     const embedResponse: Promise<string> = ipcRenderer.invoke(FETCH_URL_EVENT_NAME, {
         url: embedUrl
     });

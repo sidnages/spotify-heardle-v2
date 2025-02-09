@@ -1,5 +1,6 @@
 import path from 'path';
 import axios from 'axios';
+import log from 'electron-log/main';
 import * as fs from 'fs';
 import { app, BrowserWindow, ipcMain } from 'electron';
 import { PRIMARY_BACKGROUND_COLOR } from './constants/styleConstants';
@@ -29,29 +30,32 @@ if (require('electron-squirrel-startup')) {
 
 // Communication with renderer - certain tasks only the server can perform and not the renderer
 ipcMain.handle(FETCH_URL_EVENT_NAME, async (event, ...args) => {
-  console.log(`Received fetch URL event with URL ${args[0].url}`);
+  log.info(`Received fetch URL event with URL ${args[0].url}`);
   const response = await axios.get(args[0].url);
-  console.log(`Received response from Axios for URL ${args[0].url}`);
+  log.info(`Received response from Axios for URL ${args[0].url}`);
   return response.data;
 })
 
 ipcMain.handle(READ_FROM_FILE_EVENT_NAME, async (event, ...args) => {
-  console.log(`Received read from file event with filename ${args[0].filename}`);
+  log.info(`Received read from file event with filename ${args[0].filename}`);
   const filePath = path.join(dataDirectoryPath, args[0].filename);
   const data: any = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-  console.log(`Successfully read from file ${args[0].filename}`);
+  log.info(`Successfully read from file ${args[0].filename}`);
   return data;
 })
 
 ipcMain.handle(SAVE_TO_FILE_EVENT_NAME, async (event, ...args) => {
-  console.log(`Received save to file event with filename ${args[0].filename}`);
+  log.info(`Received save to file event with filename ${args[0].filename}`);
   const filePath = path.join(dataDirectoryPath, args[0].filename)
   fs.writeFileSync(filePath, args[0].content);
-  console.log(`Successfully saved content to file ${args[0].filename}`);
+  log.info(`Successfully saved content to file ${args[0].filename}`);
 })
 
 // Create the window and invoke renderer
 const createWindow = (): void => {
+  log.initialize();
+  log.info('--- Starting App ---');
+
   const width = 850;
   const height = 600;
 
@@ -76,7 +80,7 @@ const createWindow = (): void => {
 
   // Open the DevTools.
   if (isDev) {
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({ mode: 'detach' });
   }
 
   // Remove the top menu.
@@ -86,7 +90,7 @@ const createWindow = (): void => {
 
   // Register cleanup functions to window close.
   mainWindow.on('close', (event) => {
-    console.log('Sending app close event');
+    log.info('Sending app close event');
     mainWindow.webContents.send(APP_CLOSE_EVENT_NAME);
   });
 };
@@ -103,6 +107,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+  log.info('--- App Fully Closed ---');
 });
 
 app.on('activate', () => {
